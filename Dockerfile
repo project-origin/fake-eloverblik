@@ -5,5 +5,5 @@ COPY Pipfile.lock /app
 WORKDIR /app
 RUN pip3 install --upgrade setuptools pip pipenv
 RUN pipenv install
-EXPOSE 8765
+EXPOSE 8766
 CMD ["pipenv", "run", "serve"]
