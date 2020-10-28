@@ -24,4 +24,4 @@ python_version = "3.7"
 [scripts]
 migrate = "alembic upgrade head"
 revision = "alembic revision --autogenerate"
-serve = "gunicorn -b 0.0.0.0:8766 app:app --workers 1 --worker-class gevent --worker-connections 10"
+serve = "gunicorn -b 0.0.0.0:8766 eloverblik.app:app --workers 1 --worker-class gevent --worker-connections 10"
