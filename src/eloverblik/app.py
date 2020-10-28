@@ -1,8 +1,7 @@
 import random
 import logging
 from datetime import datetime, timedelta
-from flask import Flask, request, render_template, redirect, url_for, jsonify
-from flask_wtf.csrf import CSRFProtect
+from flask import Flask, request, render_template, redirect, jsonify
 from opencensus.ext.azure.log_exporter import AzureLogHandler
 from opencensus.ext.azure.trace_exporter import AzureExporter
 from opencensus.ext.flask.flask_middleware import FlaskMiddleware
@@ -10,6 +9,7 @@ from opencensus.trace.samplers import AlwaysOnSampler
 
 from eloverblik.models import MeteringPoint, MeteringPointType
 from eloverblik.db import atomic, inject_session
+from eloverblik.tools import random_gsrn, register_energy_type
 from eloverblik.settings import (
     SECRET,
     PROJECT_NAME,
@@ -17,7 +17,6 @@ from eloverblik.settings import (
     TECHNOLOGIES,
     AZURE_APP_INSIGHTS_CONN_STRING,
 )
-
 
 app_kwargs = dict(
     import_name=PROJECT_NAME,
@@ -27,7 +26,6 @@ app_kwargs = dict(
 app = Flask(**app_kwargs)
 app.logger.setLevel(logging.DEBUG)
 app.config['SECRET_KEY'] = SECRET
-csrf = CSRFProtect(app)
 
 
 # Setup logging using OpenCensus / Azure
@@ -96,9 +94,11 @@ def create_meteringpoints_from_form(subject, session):
             amount = int(request.form['%s_%s' % (technology, type.value)])
 
             for i in range(amount):
+                gsrn = random_gsrn()
+
                 session.add(MeteringPoint(
                     subject=subject,
-                    gsrn=random_gsrn(),
+                    gsrn=gsrn,
                     type=type,
                     technology_code=tech_code,
                     fuel_code=fuel_code,
@@ -108,12 +108,7 @@ def create_meteringpoints_from_form(subject, session):
                     postcode='8000',
                 ))
 
-
-def random_gsrn():
-    s = []
-    for i in range(15):
-        s.append(str(random.randint(0, 9)))
-    return ''.join(s)
+                register_energy_type(gsrn, tech_code, fuel_code)
 
 
 # -- API endpoints -----------------------------------------------------------
@@ -121,7 +116,7 @@ def random_gsrn():
 
 @app.route('/api/Token', methods=['GET'])
 def get_token():
-    return 'mock-token'
+    return jsonify({'result': 'mock-token'})
 
 
 @app.route('/api/Authorization/Authorization/MeteringPoints/customerKey/<subject>', methods=['GET'])
@@ -148,34 +143,37 @@ def get_meteringpoints(subject, session):
     return jsonify({'result': results})
 
 
-@app.route('/api/MeterData/GetTimeSeries/<date_from>/<date_to>/Hour', methods=['GET'])
+@app.route('/api/MeterData/GetTimeSeries/<date_from>/<date_to>/Hour', methods=['POST'])
 def get_time_series(date_from, date_to):
+    body = request.get_json()
+    gsrn = body['meteringPoints']['meteringPoint'][0]
     begin = datetime.strptime(date_from, '%Y-%m-%d')
     end = datetime.strptime(date_to, '%Y-%m-%d').replace(hour=23)
     current = begin
 
     points = []
-    position = 0
+    position = 1
 
     while current < end:
         points.append({
             'position': position,
-            'quantity': random.randint(1, 10),
+            'out_Quantity.quantity': random.randint(1, 10),
         })
         current += timedelta(hours=1)
         position += 1
 
-    return {
+    return jsonify({
         'result': [
             {
                 'MyEnergyData_MarketDocument': {
                     'TimeSeries': [
                         {
-                            'mrid': 'GSRN',
+                            'mRID': gsrn,
                             'measurement_Unit.name': 'KWH',
                             'Period': [
                                 {
-                                    'point': points,
+                                    'Point': points,
+                                    'resolution': 'PT1H',
                                     'timeInterval': {
                                         'start': str(begin),
                                         'end': str(end),
@@ -187,7 +185,7 @@ def get_time_series(date_from, date_to):
                 }
             }
         ]
-    }
+    })
 
 
 if __name__ == '__main__':

@@ -37,6 +37,8 @@ DATABASE_URI = os.environ['DATABASE_URI']
 
 # -- Misc --------------------------------------------------------------------
 
+ENERGY_TYPE_SERVICE_URL = os.environ['ENERGY_TYPE_SERVICE_URL']
+
 TECHNOLOGIES = {
     # Technology : (TechnologyCode, FuelCode)
 
