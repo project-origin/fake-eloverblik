@@ -12,13 +12,14 @@ resources:
     - repository: templates
       type: github
       endpoint: project-origin
-      name: project-origin/fake-eloverblik
+      name: project-origin/pipeline-templates
 
 variables:
   - name: releaseName
     value: 'fake-eloverblik'
   - name: imageName
     value: 'projectorigin/$(releaseName)'
+  - template: vars.yml@templates
 
 pool:
   vmImage: 'ubuntu-latest'
