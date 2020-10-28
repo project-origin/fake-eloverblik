@@ -1,0 +1,45 @@
+trigger:
+  - master
+  - preprod
+  - test
+  - develop
+
+pr: none
+
+resources:
+  repositories:
+    - repository: self
+    - repository: templates
+      type: github
+      endpoint: project-origin
+      name: project-origin/fake-eloverblik
+
+variables:
+  - name: releaseName
+    value: 'fake-eloverblik'
+  - name: imageName
+    value: 'projectorigin/$(releaseName)'
+  - template: vars.yml@templates
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+jobs:
+  - template: job-docker-build.yml@templates
+    parameters:
+      imageName: $(imageName)
+      tag: $(tag)
+      
+  - template: job-deploy.yml@templates
+    parameters:
+      dependsOn: docker_build
+      kubeCon: $(kubeCon)
+      namespace: $(namespace)
+      releaseName: $(releaseName)
+      deploymentEnvironment: $(deploymentEnvironment)
+      overrideValues: tag=$(tag)
+      pool:
+        ${{ if eq(variables['Build.SourceBranchName'], 'master') }}:
+          name: $(poolName)
+        ${{ if ne(variables['Build.SourceBranchName'], 'master') }}:
+          vmImage: 'ubuntu-latest'

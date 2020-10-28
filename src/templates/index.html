@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <title>{% block title %}{% endblock %}</title>
+</head>
+<body>
+
+    <h1>Choose MeteringPoints</h1>
+    <p>TODO write me</p>
+
+    <form action="" method="post" novalidate>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+        <table>
+            <tr>
+                <td></td>
+                <td><b>Production</b></td>
+                <td><b>Consumption</b></td>
+            </tr>
+
+            {% for technology in technologies %}
+                <tr>
+                    <td>{{ technology }}</td>
+                    <td><input type="text" name="{{ technology }}_E18" value="0" size="4"></td>
+                    <td><input type="text" name="{{ technology }}_E17" value="0" size="4"></td>
+                </tr>
+            {% endfor %}
+        </table>
+
+        <p>
+            <input type="submit" name="submitted" value="Complete onboarding">
+        </p>
+
+        <p>
+            <a href="{{ return_url }}">Go back (without saving)</a>
+        </p>
+    </form>
+
+</body>
+</html>
