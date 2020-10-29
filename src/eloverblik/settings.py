@@ -29,7 +29,7 @@ TEMPLATES_DIR = os.path.join(SOURCE_DIR, 'templates')
 SQL_ALCHEMY_SETTINGS = {
     'echo': False,
     'pool_pre_ping': True,
-    'pool_size': int(os.environ['DATABASE_CONN_POLL_SIZE']),
+    'pool_size': 1,
 }
 
 DATABASE_URI = os.environ['DATABASE_URI']
