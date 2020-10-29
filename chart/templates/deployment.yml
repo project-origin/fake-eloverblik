@@ -20,5 +20,7 @@ spec:
           envFrom:
             - configMapRef:
                 name: namespace-config
+            - secretRef:
+                name: fake-eloverblik-db-secret
             - configMapRef:
-                name: energy-type-config
+                name: fake-eloverblik-config
