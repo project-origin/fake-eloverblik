@@ -12,7 +12,7 @@ def random_gsrn():
 
 
 def register_energy_type(gsrn, tech, fuel):
-    requests.post(
+    response = requests.post(
         url='%s/add-energy-type' % ENERGY_TYPE_SERVICE_URL,
         data={
             'gsrn': gsrn,
@@ -21,3 +21,6 @@ def register_energy_type(gsrn, tech, fuel):
         }
     )
 
+    if response.status_code != 200:
+        raise Exception('Submitting energy type resulted in status %d:\n\n%s' % (
+            response.status_code, response.content))
