@@ -24,3 +24,10 @@ spec:
                 name: fake-eloverblik-db-secret
             - configMapRef:
                 name: fake-eloverblik-config
+          resources:
+            requests:
+              memory: "100Mi"
+              cpu: "250m"
+            limits:
+              memory: "500Mi"
+              cpu: "500m"
