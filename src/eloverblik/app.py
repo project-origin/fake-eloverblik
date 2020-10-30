@@ -87,28 +87,38 @@ def start_onboarding():
 
 @atomic
 def create_meteringpoints_from_form(subject, session):
+
+    for i in range(int(request.form['consumption'])):
+        session.add(MeteringPoint(
+            subject=subject,
+            gsrn=random_gsrn(),
+            type=MeteringPointType.consumption,
+            street_name='Testpunkt',
+            building_number=str(random.randint(1, 999999)),
+            city_name='Aarhus C.',
+            postcode='8000',
+        ))
+
     for technology in TECHNOLOGIES.keys():
         tech_code, fuel_code = TECHNOLOGIES[technology]
+        amount = int(request.form[technology])
 
-        for type in list(MeteringPointType):
-            amount = int(request.form['%s_%s' % (technology, type.value)])
+        for i in range(amount):
+            gsrn = random_gsrn()
 
-            for i in range(amount):
-                gsrn = random_gsrn()
+            session.add(MeteringPoint(
+                subject=subject,
+                gsrn=gsrn,
+                type=MeteringPointType.production,
+                technology_code=tech_code,
+                fuel_code=fuel_code,
+                street_name='Testpunkt',
+                building_number=str(random.randint(1, 999999)),
+                city_name='Aarhus C.',
+                postcode='8000',
+            ))
 
-                session.add(MeteringPoint(
-                    subject=subject,
-                    gsrn=gsrn,
-                    type=type,
-                    technology_code=tech_code,
-                    fuel_code=fuel_code,
-                    street_name='Testpunkt',
-                    building_number=str(random.randint(1, 999999)),
-                    city_name='Aarhus C.',
-                    postcode='8000',
-                ))
-
-                register_energy_type(gsrn, tech_code, fuel_code)
+            register_energy_type(gsrn, tech_code, fuel_code)
 
 
 # -- API endpoints -----------------------------------------------------------

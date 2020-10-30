@@ -8,21 +8,26 @@
 <body>
 
     <h1>Choose MeteringPoints</h1>
-    <p>TODO write me</p>
+    <p>Enter the number of MeteringPoints to onboard onto your Eloprindelse.dk account.</p>
 
     <form action="" method="post" novalidate>
+        <h2>Consumption</h2>
+        <p>Enter the number of consumption MeteringPoints you would you like to onboard:</p>
+        <p><input type="text" name="consumption" value="0"></p>
+
+        <h2>Production</h2>
+        <p>Enter the number of production MeteringPoints you would you like to onboard for each technology:</p>
+
         <table>
             <tr>
                 <td></td>
                 <td><b>Production</b></td>
-                <td><b>Consumption</b></td>
             </tr>
 
             {% for technology in technologies %}
                 <tr>
                     <td>{{ technology }}</td>
-                    <td><input type="text" name="{{ technology }}_E18" value="0" size="4"></td>
-                    <td><input type="text" name="{{ technology }}_E17" value="0" size="4"></td>
+                    <td><input type="text" name="{{ technology }}" value="0" size="4"></td>
                 </tr>
             {% endfor %}
         </table>
