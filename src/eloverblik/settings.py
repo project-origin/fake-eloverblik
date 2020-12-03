@@ -1,4 +1,5 @@
 import os
+import logging
 
 
 AZURE_APP_INSIGHTS_CONN_STRING = os.environ.get(
@@ -9,7 +10,13 @@ AZURE_APP_INSIGHTS_CONN_STRING = os.environ.get(
 
 PROJECT_NAME = 'FakeEloverblik'
 SECRET = 'secret!'
-# SECRET = os.environ['SECRET']
+
+_LOG_LEVEL = os.environ.get('LOG_LEVEL', 'DEBUG')
+
+if hasattr(logging, _LOG_LEVEL):
+    LOG_LEVEL = getattr(logging, _LOG_LEVEL)
+else:
+    raise ValueError('Invalid LOG_LEVEL: %s' % _LOG_LEVEL)
 
 
 # -- Directories/paths -------------------------------------------------------
@@ -19,9 +26,7 @@ __current_folder = os.path.split(__current_file)[0]
 
 SOURCE_DIR = os.path.abspath(os.path.join(__current_folder, '..'))
 MIGRATIONS_DIR = os.path.join(SOURCE_DIR, 'migrations')
-# ALEMBIC_CONFIG_PATH = os.path.join(MIGRATIONS_DIR, 'alembic.ini')
 TEMPLATES_DIR = os.path.join(SOURCE_DIR, 'templates')
-# STATIC_DIR = os.path.join(SOURCE_DIR, 'static')
 
 
 # -- Database ----------------------------------------------------------------
