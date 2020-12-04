@@ -16,6 +16,7 @@ from eloverblik.settings import (
     TEMPLATES_DIR,
     TECHNOLOGIES,
     AZURE_APP_INSIGHTS_CONN_STRING,
+    LOG_LEVEL,
 )
 
 app_kwargs = dict(
@@ -24,7 +25,7 @@ app_kwargs = dict(
 )
 
 app = Flask(**app_kwargs)
-app.logger.setLevel(logging.DEBUG)
+app.logger.setLevel(LOG_LEVEL)
 app.config['SECRET_KEY'] = SECRET
 
 
@@ -41,7 +42,8 @@ if AZURE_APP_INSIGHTS_CONN_STRING:
         export_interval=5.0,
     )
     handler.add_telemetry_processor(__telemetry_processor)
-    handler.setLevel(logging.DEBUG)
+    handler.setLevel(LOG_LEVEL)
+    app.logger.setLevel(LOG_LEVEL)
     app.logger.addHandler(handler)
 
     exporter = AzureExporter(connection_string=AZURE_APP_INSIGHTS_CONN_STRING)
